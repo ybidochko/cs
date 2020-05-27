@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width">
+   <title>repl.it</title>
+   <link href="style.css" rel="stylesheet" type="text/css" />
+ </head>
+ <body>
+   <canvas id="myCanvas" width="800" height="600" style="border:4px solid #00FF00;"></canvas>
+   <button id = "button" onClick= "restart()">Restart</button>
+
+
+
+   <script>
+ 
+ 
+     var canvas = document.getElementById("myCanvas");
+     var cx = canvas.getContext("2d");
+     var rectX = canvas.width / 2;
+     var rectY = canvas.height / 2;
+     var speedX = 20;
+     var speedY = -20;
+     var rectW = 40;
+     var rectH = 40;
+     var score = 0;
+     var coinW = 18;
+     var coinH = 18;
+     var interval = 5000;
+
+     var coinX = Math.floor(Math.random() * 761);
+     var coinY = Math.floor(Math.random() * 561);
+     
+     function coinRandom(){        
+       coinX = Math.floor(Math.random() * 761);
+       coinY = Math.floor(Math.random() * 561);
+       draw();
+     }
+ 
+     
+     var coinInterval = setInterval(coinRandom, interval);
+ 
+ 
+     function draw() {
+       cx.fillStyle = "black";
+       cx.fillRect(0, 0, canvas.width, canvas.height);
+       cx.fillStyle = "red";
+       cx.fillRect(rectX, rectY, rectW, rectH);
+       cx.fillStyle = "blue";
+       cx.fillRect(coinX, coinY, coinW, coinH);
+       cx.fillStyle = "orange";
+       cx.font = "50px Arial"
+       cx.fillText(score, 1, 40);
+     }
+
+ 
+     document.addEventListener("keydown", function(event){
+ 
+       switch (event.keyCode){
+         case 65: // a
+         case 37: // left arrow
+           rectX = rectX - speedX;
+           if (rectX < 0) {
+             rectX = 0;
+           }
+           requestAnimationFrame(draw);   
+           break;
+ 
+         case 68: // d
+         case 39: // right arrow
+           rectX = rectX + speedX;   
+           if (rectX > canvas.width - rectW) {
+             rectX = canvas.width - rectW;
+           }
+           requestAnimationFrame(draw);
+           break;
+ 
+         case 87: //w
+         case 38: //up arrow
+           rectY = rectY + speedY;
+           if (rectY < 0) {
+             rectY = 0;
+           }
+           requestAnimationFrame(draw);
+           break;
+ 
+         case 83: //s
+         case 40: //down arrow
+           rectY = rectY - speedY;
+           if (rectY > canvas.height - rectH) {
+             rectY = canvas.height - rectH;
+           }
+           requestAnimationFrame(draw);
+           break;   
+        
+       }
+       //calculate coin consumption below
+       let coinMatch = false;
+       if (rectX < coinX && rectX + rectW > coinX + coinW && rectY < coinY && rectY + rectH  > coinY + coinH) {
+         coinMatch = true;
+         console.log("it works");
+         score += 1;
+         //The %(modulo) operator in JavaScript gives the remainder obtained by dividing two numbers.
+         if (score % 5 == 0) {
+           if (interval > 1000) { //don't allow interval to be less than 1second
+             interval = interval * 0.8; //reduce interval 80%
+             console.log('Speed: ' + interval);
+           } 
+         }
+       }
+       if (coinMatch) {
+         clearInterval(coinInterval); //reset interval
+         coinRandom(); //imidietley generate new coin position
+         coinInterval = setInterval(coinRandom, interval); // and schedule interval update
+            
+       } 
+     });
+
+     function restart() {
+       window.location.reload();
+     }
+     
+     requestAnimationFrame(draw);//on program start
+     
+   </script>
+ </body>
+</html>
